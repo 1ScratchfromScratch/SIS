@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title> SIS-Music </title>
+<style>
+  :root{--bg:#0e0f10;--panel:#121213;--muted:#9a9b9c;--accent:#1fbf63;--card:#151516;--glass: rgba(255,255,255,0.03);}
+  *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  body{margin:0;background:linear-gradient(180deg,#0b0b0c,#0e0f10);color:#e6e6e6;min-height:100vh;display:flex}
+  .sidebar{width:260px;padding:24px;background:linear-gradient(180deg,var(--panel),#0f1011);display:flex;flex-direction:column;gap:12px}
+  .brand{font-weight:800;font-size:20px;color:var(--accent)}
+  .u-actions{display:flex;gap:8px;align-items:center}
+  .btn{background:#fff;color:#000;padding:8px 12px;border-radius:999px;border:0;cursor:pointer;font-weight:600}
+  .btn.secondary{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.06)}
+  .playlists{margin-top:8px;flex:1;overflow:auto;padding-right:6px}
+  .pl-item{padding:8px 10px;border-radius:6px;color:var(--muted);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+  .pl-item:hover{background:rgba(255,255,255,0.02);color:#fff}
+  .small-muted{color:var(--muted);font-size:12px}
+  .main{flex:1;padding:28px;display:flex;flex-direction:column;gap:18px}
+  .header{display:flex;justify-content:space-between;align-items:center}
+  .search{background:var(--card);padding:8px 12px;border-radius:999px;display:flex;gap:8px;align-items:center;color:var(--muted);min-width:260px}
+  .search input{background:transparent;border:0;color:#fff;outline:0;width:100%}
+  .profile{display:flex;gap:12px;align-items:center;cursor:pointer}
+  .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#2b2b2b,#191919);display:inline-block;background-size:cover;background-position:center}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:12px;border-radius:8px;cursor:pointer;transition:transform .15s}
+  .card:hover{transform:translateY(-6px)}
+  .card-cover{height:120px;border-radius:8px;background:linear-gradient(135deg,#2c2c2c,#141414);display:flex;align-items:end;padding:10px;color:#fff;font-weight:700}
+  .player{position:fixed;left:260px;right:0;bottom:0;height:92px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);backdrop-filter:blur(6px);display:flex;align-items:center;padding:12px 20px;gap:16px}
+  .now{display:flex;gap:12px;align-items:center;width:320px}
+  .now .cv{width:64px;height:64px;border-radius:6px;background:linear-gradient(135deg,#232323,#151515);background-size:cover;background-position:center}
+  .controls{flex:1;display:flex;flex-direction:column;gap:8px}
+  .controls-top{display:flex;align-items:center;gap:12px}
+  .title{font-weight:700}
+  .progress{height:6px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden;cursor:pointer}
+  .progress > i{display:block;height:100%;width:0%;background:var(--accent)}
+  .control-buttons{display:flex;gap:8px;align-items:center}
+  .icon-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  /* modal */
+  .modal{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:50}
+  .modal-card{background:#0f1011;padding:18px;border-radius:10px;width:420px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+  .field input[type="text"], .field input[type="file"]{padding:8px;border-radius:6px;background:#141415;border:0;color:#fff}
+  .row{display:flex;gap:8px}
+  .error{color:#ff6b6b;font-size:13px;margin-top:6px}
+  @media (max-width:880px){.sidebar{display:none}.player{left:0}}
+</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">Spotify In School</div>
+    <div class="u-actions">
+      <button id="uploadBtn" class="btn secondary">Upload</button>
+      <input id="fileInput" type="file" accept="audio/*" multiple style="display:none" />
+    </div>
+
+    <div class="playlists">
+      <div style="margin-bottom:8px;font-weight:700">Uploaded Songs</div>
+      <div id="uploadedList"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="header">
+      <div class="search"><span>🔎</span><input placeholder="Search music, artists, albums" /></div>
+      <div id="profileArea" class="profile" title="Click to edit profile">
+        <div id="topAvatar" class="avatar"></div>
+        <div id="topName" style="color:var(--muted)">Guest</div>
+      </div>
+    </div>
+
+    <h3 style="margin:4px 0 0">Library</h3>
+    <section class="grid" id="grid" style="margin-top:12px"></section>
+  </main>
+
+  <div class="player" id="player">
+    <div class="now">
+      <div class="cv" id="cv"></div>
+      <div>
+        <div class="title" id="trackTitle">No song playing</div>
+        <div style="color:var(--muted);font-size:13px" id="trackArtist">—</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="controls-top" style="align-items:center">
+        <div class="control-buttons">
+          <div class="icon-btn" id="prev">⏮</div>
+          <div class="icon-btn" id="play">▶️</div>
+          <div class="icon-btn" id="next">⏭</div>
+        </div>
+        <div style="margin-left:12px;color:var(--muted);font-size:13px"><span id="curTime">0:00</span> / <span id="durTime">0:00</span></div>
+      </div>
+      <div class="progress" id="progress"><i></i></div>
+    </div>
+
+    <div style="width:160px;display:flex;gap:10px;align-items:center;justify-content:flex-end;color:var(--muted)">
+      <div class="icon-btn">🔁</div>
+      <div class="icon-btn">🔀</div>
+      <div class="icon-btn">🔊</div>
+    </div>
+  </div>
+
+  <!-- Metadata modal (for uploaded songs) -->
+  <div id="metaModal" class="modal" style="display:none">
+    <div class="modal-card">
+      <h3 style="margin:0 0 10px">Add song details</h3>
+      <div class="field">
+        <label style="font-size:13px;color:var(--muted)">Song name</label>
+        <input id="metaTitle" type="text" />
+      </div>
+      <div class="field">
+        <label style="font-size:13px;color:var(--muted)">Artist</label>
+        <input id="metaArtist" type="text" />
+      </div>
+      <div class="field">
+        <label style="font-size:13px;color:var(--muted)">Cover image (optional)</label>
+        <input id="metaCover" type="file" accept="image/*" />
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <button id="metaCancel" class="btn secondary">Cancel</button>
+        <button id="metaSave" class="btn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account modal -->
+  <div id="accountModal" class="modal" style="display:none">
+    <div class="modal-card">
+      <h3 style="margin:0 0 10px">Create / Edit Account</h3>
+      <div class="field">
+        <label style="font-size:13px;color:var(--muted)">Display name</label>
+        <input id="acctName" type="text" maxlength="30" placeholder="Your display name" />
+        <div id="nameError" class="error" style="display:none"></div>
+      </div>
+      <div class="field">
+        <label style="font-size:13px;color:var(--muted)">Profile picture (optional)</label>
+        <input id="acctPic" type="file" accept="image/*" />
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <button id="acctCancel" class="btn secondary">Cancel</button>
+        <button id="acctSave" class="btn">Save</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ---------- small IndexedDB helpers (songs) ---------- */
+function openDB() {
+  return new Promise((res, rej) => {
+    const rq = indexedDB.open('my_music_db', 1);
+    rq.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('songs')) {
+        db.createObjectStore('songs', { keyPath: 'id', autoIncrement: true });
+      }
+    };
+    rq.onsuccess = () => res(rq.result);
+    rq.onerror = () => rej(rq.error);
+  });
+}
+function idbAdd(db, storeName, value) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    const st = tx.objectStore(storeName);
+    const rq = st.add(value);
+    rq.onsuccess = () => res(rq.result);
+    rq.onerror = () => rej(rq.error);
+  });
+}
+function idbGetAll(db, storeName) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(storeName, 'readonly');
+    const st = tx.objectStore(storeName);
+    const rq = st.getAll();
+    rq.onsuccess = () => res(rq.result);
+    rq.onerror = () => rej(rq.error);
+  });
+}
+
+/* ---------- elements ---------- */
+const uploadBtn = document.getElementById('uploadBtn');
+const fileInput = document.getElementById('fileInput');
+const uploadedList = document.getElementById('uploadedList');
+const grid = document.getElementById('grid');
+
+const metaModal = document.getElementById('metaModal');
+const metaTitle = document.getElementById('metaTitle');
+const metaArtist = document.getElementById('metaArtist');
+const metaCover = document.getElementById('metaCover');
+const metaSave = document.getElementById('metaSave');
+const metaCancel = document.getElementById('metaCancel');
+
+const accountModal = document.getElementById('accountModal');
+const acctName = document.getElementById('acctName');
+const acctPic = document.getElementById('acctPic');
+const acctSave = document.getElementById('acctSave');
+const acctCancel = document.getElementById('acctCancel');
+const nameError = document.getElementById('nameError');
+
+const profileArea = document.getElementById('profileArea');
+const topAvatar = document.getElementById('topAvatar');
+const topName = document.getElementById('topName');
+
+const playBtn = document.getElementById('play');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const titleEl = document.getElementById('trackTitle');
+const artistEl = document.getElementById('trackArtist');
+const cvEl = document.getElementById('cv');
+const progressOuter = document.getElementById('progress');
+const progressInner = progressOuter.querySelector('i');
+const curTimeEl = document.getElementById('curTime');
+const durTimeEl = document.getElementById('durTime');
+
+const audio = new Audio();
+audio.preload = 'metadata';
+
+/* ---------- state ---------- */
+let db;
+let pendingFiles = [];
+let pendingIndex = 0;
+let library = []; // records from DB with generated URLs
+let currentIndex = -1;
+let playing = false;
+
+/* ---------- account (localStorage) ---------- */
+const USER_KEY = 'my_music_user';
+
+function loadAccount(){
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    if(!raw) return null;
+    const obj = JSON.parse(raw);
+    if(obj && obj.name) {
+      topName.textContent = obj.name;
+      if(obj.avatar) topAvatar.style.backgroundImage = `url(${obj.avatar})`;
+      else topAvatar.style.backgroundImage = '';
+      return obj;
+    }
+  } catch(e){}
+  topName.textContent = 'Guest';
+  topAvatar.style.backgroundImage = '';
+  return null;
+}
+
+function saveAccount(obj){
+  localStorage.setItem(USER_KEY, JSON.stringify(obj));
+  loadAccount();
+}
+
+/* simple inappropriate-name checker:
+   - checks length
+   - disallows only-numeric names
+   - blocks common profanity substrings (case-insensitive)
+*/
+const BAD_WORDS = ['fuck','shit','bitch','asshole','dick','piss','bastard','slut','whore'];
+
+function isNameInappropriate(name){
+  if(!name) return {bad:true, reason:'Name is required.'};
+  const trimmed = name.trim();
+  if(trimmed.length < 2) return {bad:true, reason:'Name too short.'};
+  if(trimmed.length > 30) return {bad:true, reason:'Name too long.'};
+  if(/^\d+$/.test(trimmed)) return {bad:true, reason:'Name cannot be only numbers.'};
+  const lower = trimmed.toLowerCase();
+  // remove punctuation to catch embedded bad words like "s.h.i.t"
+  const cleaned = lower.replace(/[^a-z0-9\s]/g,'');
+  for(const w of BAD_WORDS){
+    if(cleaned.includes(w)) return {bad:true, reason:'Inappropriate language not allowed.'};
+    // also check whole-word match
+    const re = new RegExp('\\b'+w+'\\b','i');
+    if(re.test(lower)) return {bad:true, reason:'Inappropriate language not allowed.'};
+  }
+  return {bad:false};
+}
+
+/* ---------- account UI behavior ---------- */
+profileArea.addEventListener('click', ()=>{
+  // open modal to create/edit account
+  const acct = loadAccount();
+  acctName.value = acct ? acct.name : '';
+  acctPic.value = '';
+  nameError.style.display = 'none';
+  accountModal.style.display = 'flex';
+});
+
+acctCancel.addEventListener('click', ()=>{
+  accountModal.style.display = 'none';
+});
+
+acctSave.addEventListener('click', async ()=>{
+  const name = acctName.value.trim();
+  const check = isNameInappropriate(name);
+  if(check.bad){
+    nameError.textContent = check.reason;
+    nameError.style.display = 'block';
+    return;
+  }
+  let avatarData = null;
+  if(acctPic.files[0]){
+    avatarData = await fileToDataURL(acctPic.files[0]);
+  }
+  saveAccount({ name, avatar: avatarData });
+  accountModal.style.display = 'none';
+});
+
+/* show account modal on first load if no account */
+window.addEventListener('load', ()=>{
+  loadAccount();
+  const acct = localStorage.getItem(USER_KEY);
+  if(!acct){
+    // prompt user to create account
+    setTimeout(()=> accountModal.style.display = 'flex', 350);
+  }
+});
+
+/* helper to file -> dataURL */
+function fileToDataURL(file){
+  return new Promise((res)=>{
+    const r = new FileReader();
+    r.onload = ()=> res(r.result);
+    r.readAsDataURL(file);
+  });
+}
+
+/* ---------- songs upload flow (IndexedDB) ---------- */
+openDB().then(d=>{ db = d; loadLibrary(); });
+
+async function loadLibrary(){
+  const rows = await idbGetAll(db, 'songs');
+  library = rows.map(r=>{
+    const audioUrl = r.audioBlob ? URL.createObjectURL(r.audioBlob) : null;
+    const coverUrl = r.coverBlob ? URL.createObjectURL(r.coverBlob) : null;
+    return {...r, audioUrl, coverUrl};
+  });
+  renderLibrary();
+}
+
+uploadBtn.addEventListener('click', ()=> fileInput.click());
+fileInput.addEventListener('change', e=>{
+  const files = Array.from(e.target.files || []).filter(f => f.type && f.type.startsWith('audio'));
+  if(files.length === 0) { fileInput.value=''; return; }
+  pendingFiles = files;
+  pendingIndex = 0;
+  openMetaForPending();
+  fileInput.value = '';
+});
+
+function openMetaForPending(){
+  if(pendingIndex >= pendingFiles.length) return;
+  const f = pendingFiles[pendingIndex];
+  const name = f.name.replace(/\.[^/.]+$/, '');
+  metaTitle.value = name;
+  metaArtist.value = '';
+  metaCover.value = '';
+  metaModal.style.display = 'flex';
+}
+
+metaCancel.addEventListener('click', ()=>{
+  pendingFiles = [];
+  pendingIndex = 0;
+  metaModal.style.display = 'none';
+});
+
+metaSave.addEventListener('click', async ()=>{
+  const f = pendingFiles[pendingIndex];
+  if(!f){ metaModal.style.display='none'; return; }
+  const title = metaTitle.value.trim() || f.name;
+  const artist = metaArtist.value.trim() || 'Unknown';
+  const coverFile = metaCover.files[0] || null;
+
+  const audioBlob = f.slice(0, f.size, f.type);
+  let coverBlob = null;
+  if(coverFile){
+    coverBlob = coverFile.slice(0, coverFile.size, coverFile.type);
+  }
+
+  const rec = { name: title, artist, audioBlob, coverBlob, createdAt: Date.now() };
+  try {
+    const id = await idbAdd(db, 'songs', rec);
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const coverUrl = coverBlob ? URL.createObjectURL(coverBlob) : null;
+    library.push({ ...rec, id, audioUrl, coverUrl });
+    renderLibrary();
+  } catch(err){
+    console.error('DB add error', err);
+  }
+
+  pendingIndex++;
+  metaModal.style.display = 'none';
+  if(pendingIndex < pendingFiles.length) {
+    setTimeout(openMetaForPending, 150);
+  }
+});
+
+/* ---------- UI render ---------- */
+function renderLibrary(){
+  uploadedList.innerHTML = '';
+  grid.innerHTML = '';
+  if(library.length === 0){
+    uploadedList.innerHTML = '<div class="small-muted">No uploaded songs</div>';
+  } else {
+    library.forEach((s, i) => {
+      const div = document.createElement('div');
+      div.className = 'pl-item';
+      div.innerHTML = `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px">${s.name}</span>
+                       <span class="small-muted">▶</span>`;
+      div.addEventListener('click', ()=> playSong(i));
+      uploadedList.appendChild(div);
+
+      const card = document.createElement('div');
+      card.className = 'card';
+      const coverStyle = s.coverUrl ? `background-image:url(${s.coverUrl});background-size:cover;background-position:center` : '';
+      card.innerHTML = `<div class="card-cover" style="${coverStyle}">${!s.coverUrl ? 'Audio' : ''}</div>
+                        <h4>${s.name}</h4><p>${s.artist}</p>`;
+      card.addEventListener('click', ()=> playSong(i));
+      grid.appendChild(card);
+    });
+  }
+}
+
+/* ---------- player ---------- */
+function playSong(index){
+  if(index < 0 || index >= library.length) return;
+  const song = library[index];
+  currentIndex = index;
+  audio.src = song.audioUrl;
+  audio.play();
+  playing = true;
+  titleEl.textContent = song.name;
+  artistEl.textContent = song.artist;
+  cvEl.style.backgroundImage = song.coverUrl ? `url(${song.coverUrl})` : '';
+  updatePlayButton();
+}
+
+function updatePlayButton(){
+  playBtn.textContent = playing ? '⏸' : '▶️';
+}
+
+playBtn.addEventListener('click', ()=>{
+  if(currentIndex === -1 && library.length > 0){
+    playSong(0); return;
+  }
+  if(playing) audio.pause(); else audio.play();
+});
+
+prevBtn.addEventListener('click', ()=>{
+  if(library.length === 0) return;
+  currentIndex = (currentIndex <= 0) ? library.length - 1 : currentIndex - 1;
+  playSong(currentIndex);
+});
+
+nextBtn.addEventListener('click', ()=>{
+  if(library.length === 0) return;
+  currentIndex = (currentIndex + 1) % library.length;
+  playSong(currentIndex);
+});
+
+audio.addEventListener('timeupdate', ()=>{
+  if(!audio.duration) return;
+  const pct = (audio.currentTime / audio.duration) * 100;
+  progressInner.style.width = pct + '%';
+  curTimeEl.textContent = formatTime(audio.currentTime);
+  durTimeEl.textContent = formatTime(audio.duration);
+});
+
+audio.addEventListener('play', ()=>{ playing=true; updatePlayButton(); });
+audio.addEventListener('pause', ()=>{ playing=false; updatePlayButton(); });
+audio.addEventListener('ended', ()=>{ nextBtn.click(); });
+
+progressOuter.addEventListener('click', (e)=>{
+  if(!audio.duration) return;
+  const rect = progressOuter.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const pct = Math.max(0, Math.min(1, x / rect.width));
+  audio.currentTime = pct * audio.duration;
+});
+
+function formatTime(t){
+  if(!t || isNaN(t)) return '0:00';
+  const mins = Math.floor(t / 60);
+  const secs = Math.floor(t % 60).toString().padStart(2, '0');
+  return mins + ':' + secs;
+}
+
+/* cleanup */
+window.addEventListener('beforeunload', ()=>{
+  library.forEach(s=>{
+    if(s.audioUrl) URL.revokeObjectURL(s.audioUrl);
+    if(s.coverUrl) URL.revokeObjectURL(s.coverUrl);
+  });
+});
+</script>
+</body>
+</html>
