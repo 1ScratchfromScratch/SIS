@@ -13,9 +13,13 @@
   .u-actions{display:flex;gap:8px;align-items:center}
   .btn{background:#fff;color:#000;padding:8px 12px;border-radius:999px;border:0;cursor:pointer;font-weight:600}
   .btn.secondary{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.06)}
+  .btn.small{padding:6px 10px;font-size:12px}
   .playlists{margin-top:8px;flex:1;overflow:auto;padding-right:6px}
   .pl-item{padding:8px 10px;border-radius:6px;color:var(--muted);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
   .pl-item:hover{background:rgba(255,255,255,0.02);color:#fff}
+  .pl-item-actions{display:flex;gap:6px;align-items:center}
+  .delete-btn{background:transparent;color:var(--muted);border:0;cursor:pointer;padding:4px;font-size:14px}
+  .delete-btn:hover{color:#ff6b6b}
   .small-muted{color:var(--muted);font-size:12px}
   .main{flex:1;padding:28px;display:flex;flex-direction:column;gap:18px}
   .header{display:flex;justify-content:space-between;align-items:center}
@@ -23,10 +27,29 @@
   .search input{background:transparent;border:0;color:#fff;outline:0;width:100%}
   .profile{display:flex;gap:12px;align-items:center;cursor:pointer}
   .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#2b2b2b,#191919);display:inline-block;background-size:cover;background-position:center}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
-  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:12px;border-radius:8px;cursor:pointer;transition:transform .15s}
+  .artist-group{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+  .artist-header{font-size:16px;font-weight:700;color:#e6e6e6;margin-bottom:4px;padding:8px 0;display:flex;align-items:center;gap:12px}
+  .artist-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#2c2c2c,#141414);background-size:cover;background-position:center}
+  .album-group{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;padding-left:8px;border-left:2px solid rgba(31,191,99,0.3)}
+  .album-header{display:flex;align-items:center;gap:12px;padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:6px;cursor:pointer;transition:background .15s}
+  .album-header:hover{background:rgba(255,255,255,0.06)}
+  .album-header-toggle{display:inline-block;transition:transform .2s;font-size:12px;width:14px}
+  .album-header-title{font-weight:500;flex:1;color:#d0d0d0;font-size:13px}
+  .album-header-count{font-size:11px;color:var(--muted)}
+  .album-songs{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-top:8px}
+  .album-songs.hidden{display:none}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:12px;border-radius:8px;cursor:pointer;transition:transform .15s;position:relative}
   .card:hover{transform:translateY(-6px)}
-  .card-cover{height:120px;border-radius:8px;background:linear-gradient(135deg,#2c2c2c,#141414);display:flex;align-items:end;padding:10px;color:#fff;font-weight:700}
+  .card-cover{height:120px;border-radius:8px;background:linear-gradient(135deg,#2c2c2c,#141414);display:flex;align-items:end;padding:10px;color:#fff;font-weight:700;font-size:12px}
+  .card-delete{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);border:0;color:#ff6b6b;border-radius:4px;padding:6px 8px;cursor:pointer;font-size:12px;opacity:0;transition:opacity .15s}
+  .card:hover .card-delete{opacity:1}
+  .notification{position:fixed;top:20px;right:20px;background:linear-gradient(180deg,#1a1a2e,#16213e);border:1px solid var(--accent);padding:16px 20px;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,0.6);max-width:320px;z-index:40;animation:slideIn .3s ease-out}
+  @keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
+  .notification-title{font-weight:600;color:#fff;margin-bottom:8px}
+  .notification-text{font-size:13px;color:var(--muted);margin-bottom:12px}
+  .notification-actions{display:flex;gap:8px}
+  .notification-close{background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:16px;position:absolute;top:12px;right:12px}
+  .notification-close:hover{color:#fff}
   .player{position:fixed;left:260px;right:0;bottom:0;height:92px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);backdrop-filter:blur(6px);display:flex;align-items:center;padding:12px 20px;gap:16px}
   .now{display:flex;gap:12px;align-items:center;width:320px}
   .now .cv{width:64px;height:64px;border-radius:6px;background:linear-gradient(135deg,#232323,#151515);background-size:cover;background-position:center}
@@ -39,9 +62,14 @@
   .icon-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;cursor:pointer}
   /* modal */
   .modal{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:50}
-  .modal-card{background:#0f1011;padding:18px;border-radius:10px;width:420px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
-  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
-  .field input[type="text"], .field input[type="file"]{padding:8px;border-radius:6px;background:#141415;border:0;color:#fff}
+  .modal-card{background:#0f1011;padding:18px;border-radius:10px;width:420px;box-shadow:0 8px 30px rgba(0,0,0,0.6);max-height:90vh;overflow-y:auto}
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;position:relative}
+  .field input[type="text"], .field input[type="file"], .field input[type="number"]{padding:8px;border-radius:6px;background:#141415;border:0;color:#fff}
+  .autocomplete-list{position:absolute;top:100%;left:0;right:0;background:#141415;border:1px solid rgba(31,191,99,0.3);border-top:0;border-radius:0 0 6px 6px;max-height:150px;overflow-y:auto;z-index:100;display:none}
+  .autocomplete-list.active{display:block}
+  .autocomplete-item{padding:8px 12px;cursor:pointer;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.02)}
+  .autocomplete-item:hover{background:rgba(31,191,99,0.2);color:#fff}
+  .autocomplete-item-avatar{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#2c2c2c,#141414);background-size:cover;background-position:center}
   .row{display:flex;gap:8px}
   .error{color:#ff6b6b;font-size:13px;margin-top:6px}
   @media (max-width:880px){.sidebar{display:none}.player{left:0}}
@@ -71,7 +99,8 @@
     </div>
 
     <h3 style="margin:4px 0 0">Library</h3>
-    <section class="grid" id="grid" style="margin-top:12px"></section>
+    <div id="notificationContainer"></div>
+    <section id="grid" style="margin-top:12px"></section>
   </main>
 
   <div class="player" id="player">
@@ -112,7 +141,20 @@
       </div>
       <div class="field">
         <label style="font-size:13px;color:var(--muted)">Artist</label>
-        <input id="metaArtist" type="text" />
+        <input id="metaArtist" type="text" autocomplete="off" />
+        <div id="artistSuggestions" class="autocomplete-list"></div>
+        <div id="artistPfpContainer" style="display:none;margin-top:12px">
+          <label style="font-size:13px;color:var(--muted)">Artist profile picture (optional)</label>
+          <input id="metaArtistPfp" type="file" accept="image/*" />
+        </div>
+      </div>
+      <div class="field">
+        <label style="font-size:13px;color:var(--muted)">Album</label>
+        <input id="metaAlbum" type="text" />
+      </div>
+      <div class="field">
+        <label style="font-size:13px;color:var(--muted)">Track Position</label>
+        <input id="metaTrackPos" type="number" min="1" />
       </div>
       <div class="field">
         <label style="font-size:13px;color:var(--muted)">Cover image (optional)</label>
@@ -145,6 +187,22 @@
     </div>
   </div>
 
+  <!-- Album cover upload modal -->
+  <div id="albumCoverModal" class="modal" style="display:none">
+    <div class="modal-card">
+      <h3 style="margin:0 0 10px">Set Album Cover</h3>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:12px" id="albumCoverName"></p>
+      <div class="field">
+        <label style="font-size:13px;color:var(--muted)">Upload cover image</label>
+        <input id="albumCoverFile" type="file" accept="image/*" />
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <button id="albumCoverCancel" class="btn secondary">Cancel</button>
+        <button id="albumCoverSave" class="btn">Save Cover</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 /* ---------- small IndexedDB helpers (songs) ---------- */
 function openDB() {
@@ -154,6 +212,9 @@ function openDB() {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('songs')) {
         db.createObjectStore('songs', { keyPath: 'id', autoIncrement: true });
+      }
+      if (!db.objectStoreNames.contains('artists')) {
+        db.createObjectStore('artists', { keyPath: 'name', autoIncrement: false });
       }
     };
     rq.onsuccess = () => res(rq.result);
@@ -178,16 +239,49 @@ function idbGetAll(db, storeName) {
     rq.onerror = () => rej(rq.error);
   });
 }
+function idbDelete(db, storeName, key) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    const st = tx.objectStore(storeName);
+    const rq = st.delete(key);
+    rq.onsuccess = () => res();
+    rq.onerror = () => rej(rq.error);
+  });
+}
+function idbUpdate(db, storeName, value) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    const st = tx.objectStore(storeName);
+    const rq = st.put(value);
+    rq.onsuccess = () => res();
+    rq.onerror = () => rej(rq.error);
+  });
+}
+function idbGet(db, storeName, key) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(storeName, 'readonly');
+    const st = tx.objectStore(storeName);
+    const rq = st.get(key);
+    rq.onsuccess = () => res(rq.result);
+    rq.onerror = () => rej(rq.error);
+  });
+}
 
 /* ---------- elements ---------- */
 const uploadBtn = document.getElementById('uploadBtn');
 const fileInput = document.getElementById('fileInput');
 const uploadedList = document.getElementById('uploadedList');
 const grid = document.getElementById('grid');
+const notificationContainer = document.getElementById('notificationContainer');
 
 const metaModal = document.getElementById('metaModal');
 const metaTitle = document.getElementById('metaTitle');
 const metaArtist = document.getElementById('metaArtist');
+const artistSuggestions = document.getElementById('artistSuggestions');
+const artistPfpContainer = document.getElementById('artistPfpContainer');
+const metaArtistPfp = document.getElementById('metaArtistPfp');
+const metaAlbum = document.getElementById('metaAlbum');
+const metaTrackPos = document.getElementById('metaTrackPos');
 const metaCover = document.getElementById('metaCover');
 const metaSave = document.getElementById('metaSave');
 const metaCancel = document.getElementById('metaCancel');
@@ -198,6 +292,12 @@ const acctPic = document.getElementById('acctPic');
 const acctSave = document.getElementById('acctSave');
 const acctCancel = document.getElementById('acctCancel');
 const nameError = document.getElementById('nameError');
+
+const albumCoverModal = document.getElementById('albumCoverModal');
+const albumCoverName = document.getElementById('albumCoverName');
+const albumCoverFile = document.getElementById('albumCoverFile');
+const albumCoverSave = document.getElementById('albumCoverSave');
+const albumCoverCancel = document.getElementById('albumCoverCancel');
 
 const profileArea = document.getElementById('profileArea');
 const topAvatar = document.getElementById('topAvatar');
@@ -222,8 +322,12 @@ let db;
 let pendingFiles = [];
 let pendingIndex = 0;
 let library = []; // records from DB with generated URLs
+let artists = {}; // artist name -> { pfp: url }
 let currentIndex = -1;
 let playing = false;
+let currentAlbumForCover = null;
+let shownNotifications = new Set();
+let selectedArtist = null;
 
 /* ---------- account (localStorage) ---------- */
 const USER_KEY = 'my_music_user';
@@ -250,11 +354,7 @@ function saveAccount(obj){
   loadAccount();
 }
 
-/* simple inappropriate-name checker:
-   - checks length
-   - disallows only-numeric names
-   - blocks common profanity substrings (case-insensitive)
-*/
+/* simple inappropriate-name checker */
 const BAD_WORDS = ['fuck','shit','bitch','asshole','dick','piss','bastard','slut','whore'];
 
 function isNameInappropriate(name){
@@ -264,20 +364,168 @@ function isNameInappropriate(name){
   if(trimmed.length > 30) return {bad:true, reason:'Name too long.'};
   if(/^\d+$/.test(trimmed)) return {bad:true, reason:'Name cannot be only numbers.'};
   const lower = trimmed.toLowerCase();
-  // remove punctuation to catch embedded bad words like "s.h.i.t"
   const cleaned = lower.replace(/[^a-z0-9\s]/g,'');
   for(const w of BAD_WORDS){
     if(cleaned.includes(w)) return {bad:true, reason:'Inappropriate language not allowed.'};
-    // also check whole-word match
     const re = new RegExp('\\b'+w+'\\b','i');
     if(re.test(lower)) return {bad:true, reason:'Inappropriate language not allowed.'};
   }
   return {bad:false};
 }
 
+/* ---------- artist autocomplete ---------- */
+async function loadArtists(){
+  try {
+    const allArtists = await idbGetAll(db, 'artists');
+    artists = {};
+    allArtists.forEach(a => {
+      artists[a.name] = { pfp: a.pfp };
+    });
+  } catch(err){
+    console.error('Load artists error', err);
+  }
+}
+
+async function saveArtist(name, pfp){
+  try {
+    await idbUpdate(db, 'artists', { name, pfp });
+    artists[name] = { pfp };
+  } catch(err){
+    console.error('Save artist error', err);
+  }
+}
+
+function updateArtistSuggestions(){
+  const input = metaArtist.value.toLowerCase().trim();
+  const matches = Object.keys(artists).filter(a => 
+    a.toLowerCase().includes(input) && a.toLowerCase() !== input
+  );
+
+  const suggestionsList = artistSuggestions;
+  suggestionsList.innerHTML = '';
+  
+  if(matches.length > 0 && input.length > 0){
+    matches.forEach(artistName => {
+      const item = document.createElement('div');
+      item.className = 'autocomplete-item';
+      const pfp = artists[artistName].pfp;
+      const avatar = document.createElement('div');
+      avatar.className = 'autocomplete-item-avatar';
+      if(pfp) avatar.style.backgroundImage = `url(${pfp})`;
+      item.appendChild(avatar);
+      const label = document.createElement('span');
+      label.textContent = artistName;
+      item.appendChild(label);
+      item.addEventListener('click', ()=>{
+        metaArtist.value = artistName;
+        selectedArtist = artistName;
+        artistPfpContainer.style.display = 'none';
+        suggestionsList.classList.remove('active');
+      });
+      suggestionsList.appendChild(item);
+    });
+    suggestionsList.classList.add('active');
+  } else {
+    suggestionsList.classList.remove('active');
+  }
+
+  // Check if artist is new
+  const fullInput = metaArtist.value.trim();
+  if(fullInput && !artists[fullInput]){
+    artistPfpContainer.style.display = 'block';
+    selectedArtist = null;
+  } else {
+    artistPfpContainer.style.display = 'none';
+    selectedArtist = fullInput || null;
+  }
+}
+
+metaArtist.addEventListener('input', updateArtistSuggestions);
+metaArtist.addEventListener('focus', updateArtistSuggestions);
+document.addEventListener('click', (e)=>{
+  if(!metaModal.contains(e.target) || !metaArtist.contains(e.target)){
+    artistSuggestions.classList.remove('active');
+  }
+});
+
+/* ---------- notifications ---------- */
+function showNotification(albumName, songCount){
+  const notifId = `album-${albumName}`;
+  if(shownNotifications.has(notifId)) return;
+  shownNotifications.add(notifId);
+
+  const notif = document.createElement('div');
+  notif.className = 'notification';
+  notif.innerHTML = `
+    <button class="notification-close">✕</button>
+    <div class="notification-title">Album Detected</div>
+    <div class="notification-text">We've noticed these songs share an album. Please set a cover.</div>
+    <div class="notification-actions">
+      <button class="btn small" data-album="${albumName}">Upload Cover</button>
+    </div>
+  `;
+  
+  notif.querySelector('.notification-close').addEventListener('click', ()=>{
+    notif.remove();
+  });
+
+  notif.querySelector('.btn').addEventListener('click', ()=>{
+    currentAlbumForCover = albumName;
+    albumCoverName.textContent = `Album: ${albumName}`;
+    albumCoverFile.value = '';
+    albumCoverModal.style.display = 'flex';
+    notif.remove();
+  });
+
+  notificationContainer.appendChild(notif);
+  setTimeout(()=> notif.remove(), 6000);
+}
+
+/* ---------- album cover modal ---------- */
+albumCoverCancel.addEventListener('click', ()=>{
+  albumCoverModal.style.display = 'none';
+  currentAlbumForCover = null;
+});
+
+albumCoverSave.addEventListener('click', async ()=>{
+  if(!albumCoverFile.files[0] || !currentAlbumForCover){
+    albumCoverModal.style.display = 'none';
+    return;
+  }
+
+  const coverBlob = albumCoverFile.files[0].slice(0, albumCoverFile.files[0].size, albumCoverFile.files[0].type);
+  const coverUrl = URL.createObjectURL(coverBlob);
+
+  // Update all songs in this album
+  for(let song of library){
+    if(song.album === currentAlbumForCover){
+      song.coverBlob = coverBlob;
+      song.coverUrl = coverUrl;
+      song.updatedAt = Date.now();
+      try {
+        await idbUpdate(db, 'songs', {
+          id: song.id,
+          name: song.name,
+          artist: song.artist,
+          album: song.album,
+          trackPos: song.trackPos,
+          audioBlob: song.audioBlob,
+          coverBlob: coverBlob,
+          createdAt: song.createdAt
+        });
+      } catch(err){
+        console.error('Update error', err);
+      }
+    }
+  }
+
+  renderLibrary();
+  albumCoverModal.style.display = 'none';
+  currentAlbumForCover = null;
+});
+
 /* ---------- account UI behavior ---------- */
 profileArea.addEventListener('click', ()=>{
-  // open modal to create/edit account
   const acct = loadAccount();
   acctName.value = acct ? acct.name : '';
   acctPic.value = '';
@@ -305,17 +553,14 @@ acctSave.addEventListener('click', async ()=>{
   accountModal.style.display = 'none';
 });
 
-/* show account modal on first load if no account */
 window.addEventListener('load', ()=>{
   loadAccount();
   const acct = localStorage.getItem(USER_KEY);
   if(!acct){
-    // prompt user to create account
     setTimeout(()=> accountModal.style.display = 'flex', 350);
   }
 });
 
-/* helper to file -> dataURL */
 function fileToDataURL(file){
   return new Promise((res)=>{
     const r = new FileReader();
@@ -325,7 +570,7 @@ function fileToDataURL(file){
 }
 
 /* ---------- songs upload flow (IndexedDB) ---------- */
-openDB().then(d=>{ db = d; loadLibrary(); });
+openDB().then(async d=>{ db = d; await loadArtists(); loadLibrary(); });
 
 async function loadLibrary(){
   const rows = await idbGetAll(db, 'songs');
@@ -335,6 +580,16 @@ async function loadLibrary(){
     return {...r, audioUrl, coverUrl};
   });
   renderLibrary();
+}
+
+async function deleteSong(id){
+  try {
+    await idbDelete(db, 'songs', id);
+    library = library.filter(s => s.id !== id);
+    renderLibrary();
+  } catch(err){
+    console.error('DB delete error', err);
+  }
 }
 
 uploadBtn.addEventListener('click', ()=> fileInput.click());
@@ -353,7 +608,14 @@ function openMetaForPending(){
   const name = f.name.replace(/\.[^/.]+$/, '');
   metaTitle.value = name;
   metaArtist.value = '';
+  selectedArtist = null;
+  metaAlbum.value = '';
+  metaTrackPos.value = '';
   metaCover.value = '';
+  metaArtistPfp.value = '';
+  artistPfpContainer.style.display = 'none';
+  artistSuggestions.innerHTML = '';
+  artistSuggestions.classList.remove('active');
   metaModal.style.display = 'flex';
 }
 
@@ -368,7 +630,10 @@ metaSave.addEventListener('click', async ()=>{
   if(!f){ metaModal.style.display='none'; return; }
   const title = metaTitle.value.trim() || f.name;
   const artist = metaArtist.value.trim() || 'Unknown';
+  const album = metaAlbum.value.trim() || 'Unknown Album';
+  const trackPos = parseInt(metaTrackPos.value) || 0;
   const coverFile = metaCover.files[0] || null;
+  const artistPfpFile = metaArtistPfp.files[0] || null;
 
   const audioBlob = f.slice(0, f.size, f.type);
   let coverBlob = null;
@@ -376,12 +641,31 @@ metaSave.addEventListener('click', async ()=>{
     coverBlob = coverFile.slice(0, coverFile.size, coverFile.type);
   }
 
-  const rec = { name: title, artist, audioBlob, coverBlob, createdAt: Date.now() };
+  // Save artist if new
+  if(!artists[artist] && artistPfpFile){
+    const pfpData = await fileToDataURL(artistPfpFile);
+    await saveArtist(artist, pfpData);
+  } else if(!artists[artist] && !artistPfpFile){
+    await saveArtist(artist, null);
+  }
+
+  const rec = { name: title, artist, album, trackPos, audioBlob, coverBlob, createdAt: Date.now() };
   try {
     const id = await idbAdd(db, 'songs', rec);
     const audioUrl = URL.createObjectURL(audioBlob);
     const coverUrl = coverBlob ? URL.createObjectURL(coverBlob) : null;
-    library.push({ ...rec, id, audioUrl, coverUrl });
+    const newSong = { ...rec, id, audioUrl, coverUrl };
+    library.push(newSong);
+
+    // Check if this album has multiple songs without cover
+    const albumSongs = library.filter(s => s.album === album);
+    if(albumSongs.length >= 2){
+      const noCoverCount = albumSongs.filter(s => !s.coverUrl).length;
+      if(noCoverCount >= 2){
+        showNotification(album, albumSongs.length);
+      }
+    }
+
     renderLibrary();
   } catch(err){
     console.error('DB add error', err);
@@ -401,21 +685,112 @@ function renderLibrary(){
   if(library.length === 0){
     uploadedList.innerHTML = '<div class="small-muted">No uploaded songs</div>';
   } else {
-    library.forEach((s, i) => {
+    // Group by artist, then by album
+    const groupedArtists = {};
+    library.forEach(s => {
+      const artistKey = s.artist || 'Unknown Artist';
+      if(!groupedArtists[artistKey]) groupedArtists[artistKey] = {};
+      
+      const albumKey = s.album || 'Unknown Album';
+      if(!groupedArtists[artistKey][albumKey]) groupedArtists[artistKey][albumKey] = [];
+      groupedArtists[artistKey][albumKey].push(s);
+    });
+
+    // Sort songs within each album by trackPos
+    Object.keys(groupedArtists).forEach(artistKey => {
+      Object.keys(groupedArtists[artistKey]).forEach(albumKey => {
+        groupedArtists[artistKey][albumKey].sort((a, b) => (a.trackPos || 0) - (b.trackPos || 0));
+      });
+    });
+
+    // Render sidebar list (all songs with delete)
+    library.forEach(s => {
       const div = document.createElement('div');
       div.className = 'pl-item';
-      div.innerHTML = `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px">${s.name}</span>
-                       <span class="small-muted">▶</span>`;
-      div.addEventListener('click', ()=> playSong(i));
+      div.innerHTML = `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px">${s.name}</span>
+                       <div class="pl-item-actions">
+                         <span class="small-muted">▶</span>
+                         <button class="delete-btn" data-id="${s.id}">✕</button>
+                       </div>`;
+      div.querySelector('span').addEventListener('click', ()=> playSong(library.indexOf(s)));
+      div.querySelector('.delete-btn').addEventListener('click', (e)=>{
+        e.stopPropagation();
+        deleteSong(s.id);
+      });
       uploadedList.appendChild(div);
+    });
 
-      const card = document.createElement('div');
-      card.className = 'card';
-      const coverStyle = s.coverUrl ? `background-image:url(${s.coverUrl});background-size:cover;background-position:center` : '';
-      card.innerHTML = `<div class="card-cover" style="${coverStyle}">${!s.coverUrl ? 'Audio' : ''}</div>
-                        <h4>${s.name}</h4><p>${s.artist}</p>`;
-      card.addEventListener('click', ()=> playSong(i));
-      grid.appendChild(card);
+    // Render grid with hierarchical grouping: Artist > Album > Songs
+    Object.keys(groupedArtists).forEach(artistKey => {
+      const artistGroup = document.createElement('div');
+      artistGroup.className = 'artist-group';
+
+      const artistHeader = document.createElement('div');
+      artistHeader.className = 'artist-header';
+      const artistAvatar = document.createElement('div');
+      artistAvatar.className = 'artist-avatar';
+      if(artists[artistKey] && artists[artistKey].pfp){
+        artistAvatar.style.backgroundImage = `url(${artists[artistKey].pfp})`;
+      }
+      artistHeader.appendChild(artistAvatar);
+      const artistName = document.createElement('span');
+      artistName.textContent = artistKey;
+      artistHeader.appendChild(artistName);
+      artistGroup.appendChild(artistHeader);
+
+      Object.keys(groupedArtists[artistKey]).forEach(albumKey => {
+        const albumGroup = document.createElement('div');
+        albumGroup.className = 'album-group';
+
+        const header = document.createElement('div');
+        header.className = 'album-header';
+        const toggle = document.createElement('span');
+        toggle.className = 'album-header-toggle';
+        toggle.textContent = '▼';
+        const title = document.createElement('div');
+        title.className = 'album-header-title';
+        title.textContent = albumKey;
+        const count = document.createElement('div');
+        count.className = 'album-header-count';
+        count.textContent = `${groupedArtists[artistKey][albumKey].length} songs`;
+
+        header.appendChild(toggle);
+        header.appendChild(title);
+        header.appendChild(count);
+
+        const songsContainer = document.createElement('div');
+        songsContainer.className = 'album-songs';
+        let isOpen = true;
+
+        groupedArtists[artistKey][albumKey].forEach(s => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          const coverStyle = s.coverUrl ? `background-image:url(${s.coverUrl});background-size:cover;background-position:center` : '';
+          card.innerHTML = `<div class="card-cover" style="${coverStyle}">${!s.coverUrl ? 'Audio' : ''}</div>
+                            <h4>${s.name}</h4><p>${s.artist}</p>
+                            <button class="card-delete" data-id="${s.id}">Delete</button>`;
+          card.querySelector('.card-cover').addEventListener('click', ()=> playSong(library.indexOf(s)));
+          card.querySelector('h4').addEventListener('click', ()=> playSong(library.indexOf(s)));
+          card.querySelector('p').addEventListener('click', ()=> playSong(library.indexOf(s)));
+          card.querySelector('.card-delete').addEventListener('click', (e)=>{
+            e.stopPropagation();
+            deleteSong(s.id);
+          });
+          songsContainer.appendChild(card);
+        });
+
+        header.addEventListener('click', ()=>{
+          isOpen = !isOpen;
+          songsContainer.classList.toggle('hidden');
+          toggle.textContent = isOpen ? '▼' : '▶';
+        });
+
+        albumGroup.appendChild(header);
+        albumGroup.appendChild(songsContainer);
+        artistGroup.appendChild(albumGroup);
+      });
+
+      grid.appendChild(artistGroup);
     });
   }
 }
